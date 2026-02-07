@@ -1,0 +1,12 @@
+node_modules
+
+# opensrc - source code for packages
+opensrc/
+
+# Build output
+dist/
+coverage/
+
+# IDE
+.vscode/
+.claude/

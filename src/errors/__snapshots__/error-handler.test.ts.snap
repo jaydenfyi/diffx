@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`createNoFilesMatchedError > maintains stable error message for user expectations 1`] = `
+{
+  "exitCode": 1,
+  "exitCodeValue": 1,
+  "message": "No files matched the specified filters",
+}
+`;
+
+exports[`createNoFilesMatchedError maintains stable error message for user expectations 1`] = `
+{
+  "exitCode": 1,
+  "exitCodeValue": 1,
+  "message": "No files matched the specified filters",
+}
+`;
