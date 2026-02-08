@@ -1,5 +1,5 @@
 ---
-name: use-diffx-cli
+name: diffx
 description: Operate the diffx Git-diff CLI for worktree diffs, local/remote ref ranges, GitHub PR diffs, GitLab MR diffs, commit/compare URL diffs, and git-diff-compatible pass-through. Use when an agent must decide what to diff, map intent to `diffx` input syntax, choose output mode (`diff`/`patch`/`stat`/etc.), apply include/exclude filters, or resolve common flag/pager conflicts.
 ---
 
