@@ -5,16 +5,7 @@ A CLI utility for diffing Git changes across working trees, refs, GitHub PRs, Gi
 ## Install
 
 ```bash
-# npm
 npm install -g @jaydenfyi/diffx
-# yarn
-yarn global add @jaydenfyi/diffx
-# pnpm
-pnpm add -g @jaydenfyi/diffx
-# or
-bun add -g @jaydenfyi/diffx
-
-# or one off
 npx @jaydenfyi/diffx
 ```
 
