@@ -13,8 +13,9 @@ yarn global add @jaydenfyi/diffx
 pnpm add -g @jaydenfyi/diffx
 # or
 bun add -g @jaydenfyi/diffx
-# or
-npx @jaydenfyi/diffx --help
+
+# or one off
+npx @jaydenfyi/diffx
 ```
 
 ## Quick Start
