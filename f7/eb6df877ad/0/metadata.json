@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "f7eb6df877ad",
+  "session_id": "76d701aa-5da9-4f71-959c-ca1d473b52b1",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-10T17:52:11.237733Z",
+  "branch": "feature/entire-test",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "e2297ef2-a663-44e1-ab53-048951cd3154",
+  "checkpoint_transcript_start": 58,
+  "transcript_lines_at_start": 58,
+  "token_usage": {
+    "input_tokens": 1282,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 90624,
+    "output_tokens": 283,
+    "api_call_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-10T17:52:11.224873Z",
+    "agent_lines": 2,
+    "human_added": 929,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 931,
+    "agent_percentage": 0.21482277121374865
+  }
+}
