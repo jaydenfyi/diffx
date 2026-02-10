@@ -1,39 +1,26 @@
-<h1 align="center">diffx</h1>
+# diffx
 
-<p align="center">A CLI utility for easily diffing Git changes across your working tree, local refs, remote refs, GitHub PRs, GitLab MRs, or any Git URLs.</p>
+A CLI utility for diffing Git changes across working trees, refs, GitHub PRs, GitLab MRs, and Git URLs.
 
-## Quick Start
-
-### Install
+## Install
 
 ```bash
 # npm
 npm install -g @jaydenfyi/diffx
-
-# bun
+# or
 bun add -g @jaydenfyi/diffx
-
-# no install
+# or
 npx @jaydenfyi/diffx --help
 ```
 
-### Most useful commands
+## Quick Start
 
 ```bash
-# 1) Show all current local changes (tracked + untracked)
-diffx
-
-# 2) Compare two refs
-diffx main..feature
-
-# 3) Diff a GitHub PR
-diffx https://github.com/owner/repo/pull/123
-
-# 4) Generate an apply-able patch
-diffx main..feature --mode patch
-
-# 5) Quick status view
-diffx --name-status
+diffx                                    # Show all local changes
+diffx main..feature                      # Compare two refs
+diffx https://github.com/owner/repo/pull/123  # Diff a GitHub PR
+diffx main..feature --mode patch         # Generate a patch
+diffx --name-status                      # Quick status view
 ```
 
 ## `diffx` vs `git diff`
@@ -56,13 +43,10 @@ Use `--index` for strict `git diff` compatibility (index vs worktree behavior).
 
 ## Input Formats
 
-### No range argument (default behavior)
+### No argument
 
 ```bash
-# Uses current worktree first (tracked + untracked)
-diffx
-
-# If there are no local changes, falls back to inferred base..HEAD
+diffx  # Current worktree (tracked + untracked)
 ```
 
 ### Local ranges
@@ -126,18 +110,7 @@ diffx gitlab:owner/repo!123
 
 ## Output Modes
 
-`diffx` defaults to `diff` mode.
-
-- `diff`: unified diff output.
-- `patch`: patch output (for `git apply` style use).
-- `stat`: per-file histogram + summary line.
-- `numstat`: tab-delimited additions/deletions per file.
-- `shortstat`: one summary line only.
-- `name-only`: changed filenames only.
-- `name-status`: status + filename (e.g. `M`, `A`, `D`, `U`).
-- `summary`: structural summary (`create mode`, `rename`, etc.), equivalent to `git diff --summary`.
-
-Examples:
+`diff`, `patch`, `stat`, `numstat`, `shortstat`, `name-only`, `name-status`, `summary`
 
 ```bash
 diffx main..feature --mode patch
@@ -148,25 +121,14 @@ diffx --name-status
 ## Filtering
 
 ```bash
-# Include only TypeScript files
-diffx main..feature --include "src/**/*.ts"
-
-# Exclude tests
-diffx main..feature --exclude "**/*.test.ts"
-
-# Combine include + exclude
-diffx main..feature --include "src/**" --exclude "**/*.spec.ts"
-
-# Repeat include/exclude flags (matches any include; excludes any exclude)
-diffx --include "*.ts" --include "*.tsx" --exclude "*.js" --exclude "*.jsx"
+diffx main..feature --include "src/**/*.ts"          # Include only
+diffx main..feature --exclude "**/*.test.ts"         # Exclude only
+diffx main..feature -i "src/**" -e "**/*.spec.ts"    # Both (repeatable)
 ```
 
 ## Pager behavior
 
-- Diff/patch output auto-pages on TTY (git-like behavior).
-- Honors `GIT_PAGER`, `core.pager`, `PAGER`.
-- Use `--pager` to force paging.
-- Use `--no-pager` to disable paging.
+Auto-pages on TTY. Honors `GIT_PAGER`, `core.pager`, `PAGER`. Use `--pager` / `--no-pager` to override.
 
 ## Options Reference
 
@@ -187,17 +149,14 @@ diffx --include "*.ts" --include "*.tsx" --exclude "*.js" --exclude "*.jsx"
 | `--help`              | `-h`  | Show help                                                                                                  |
 | `--version`           | `-v`  | Show version                                                                                               |
 
-## Git Pass-through Compatibility
+## Git Pass-through
 
-`diffx` forwards unknown/standard `git diff` flags to git when possible, including pathspec support after `--`.
+Forwards unknown flags to `git diff`, including pathspec after `--`.
 
 ```bash
 diffx main..feature -U10 --word-diff
-
 diffx --stat -- src/cli src/utils
 ```
-
-This allows existing `git diff` habits while still using `diffx` input resolution and workflows.
 
 ## Exit Codes
 
@@ -210,13 +169,10 @@ This allows existing `git diff` habits while still using `diffx` input resolutio
 
 ## Development
 
-This repository uses `bun`.
-
 ```bash
 bun install
 bun run build
 bun run test
-bun run test:e2e
 bun run lint
 bun run typecheck
 ```
