@@ -1,0 +1,25 @@
+please simplify the readme a bit. just reduce any unnecessary fluff.
+
+---
+
+anything else that can/shouild be dropped?
+
+---
+
+i mean, some of it seems inmportant. be more well considered what can be tweaked or dropped if anything
+
+---
+
+Eh. just change 1 line that you feel should be changed
+
+---
+
+add yarn to the install list please
+
+---
+
+remove everything excide npm from the install now
+
+---
+
+oh ad dnpx back
