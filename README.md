@@ -1,24 +1,11 @@
 # diffx
 
-A CLI utility for diffing Git changes across working trees, refs, GitHub PRs, GitLab MRs, and Git URLs.
+A supercharged `git diff` that works across working trees, refs, PRs, MRs, and any Git URL.
 
 ## Install
 
 ```bash
-# npm
-npm install -g @jaydenfyi/diffx
-
-# yarn
-yarn global add @jaydenfyi/diffx
-
-# pnpm
-pnpm add -g @jaydenfyi/diffx
-
-# bun
-bun add -g @jaydenfyi/diffx
-
-# or one off
-npx @jaydenfyi/diffx
+npm install -g @jaydenfyi/diffx    # or npx @jaydenfyi/diffx for one-off
 ```
 
 ## Quick Start
