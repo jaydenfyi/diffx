@@ -10,3 +10,4 @@ coverage/
 # IDE
 .vscode/
 .claude/
+.entire/
