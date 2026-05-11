@@ -10,4 +10,8 @@ coverage/
 # IDE
 .vscode/
 .claude/
+
+# Tooling
 .entire/
+.local/
+skills/

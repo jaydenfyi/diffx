@@ -42,14 +42,23 @@ export async function resolveRemoteRefs(range: RefRange): Promise<{
 	const rightDestRef = `${tempPrefix}/right`;
 
 	try {
-		// Fetch the refs (shallow fetch) without creating a remote
 		await gitClient.fetchFromUrl(
 			remoteUrl,
 			[`${leftRemoteRef}:${leftDestRef}`, `${rightRemoteRef}:${rightDestRef}`],
 			1,
 		);
 
-		// Return as temp refs
+		if (range.rangeSyntax === "three-dot") {
+			const mergeBase = (await gitClient.mergeBase(leftDestRef, rightDestRef)).trim();
+			return {
+				left: mergeBase,
+				right: rightDestRef,
+				cleanup: async () => {
+					await gitClient.deleteRefs([leftDestRef, rightDestRef]);
+				},
+			};
+		}
+
 		return {
 			left: leftDestRef,
 			right: rightDestRef,

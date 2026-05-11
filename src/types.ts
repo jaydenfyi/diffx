@@ -29,11 +29,15 @@ export type RefType =
 	| "github-compare-url"
 	| "gitlab-mr-ref";
 
+export type RangeSyntax = "two-dot" | "three-dot";
+
 /** Parsed reference range */
 export interface RefRange {
 	type: RefType;
 	left: string;
 	right: string;
+	/** The range separator syntax used in the input */
+	rangeSyntax: RangeSyntax | undefined;
 	/** Owner/repo for remote refs (e.g., "octocat/Hello-World") */
 	ownerRepo?: string;
 	/** PR/MR number for PR/MR refs */

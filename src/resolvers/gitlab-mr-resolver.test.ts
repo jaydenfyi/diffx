@@ -26,6 +26,7 @@ describe("GitLab MR resolver", () => {
 		it("should resolve GitLab MR refs", async () => {
 			const range = {
 				type: "gitlab-mr-ref" as const,
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -55,6 +56,7 @@ describe("GitLab MR resolver", () => {
 		it("should cleanup refs on cleanup call", async () => {
 			const range = {
 				type: "gitlab-mr-ref" as const,
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -79,6 +81,7 @@ describe("GitLab MR resolver", () => {
 		it("should throw error for invalid owner/repo", async () => {
 			const range = {
 				type: "gitlab-mr-ref" as const,
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "invalid",
@@ -91,6 +94,7 @@ describe("GitLab MR resolver", () => {
 		it("should throw error for missing MR number", async () => {
 			const range = {
 				type: "gitlab-mr-ref" as const,
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -103,6 +107,7 @@ describe("GitLab MR resolver", () => {
 		it("should throw error when fetch fails", async () => {
 			const range = {
 				type: "gitlab-mr-ref" as const,
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",

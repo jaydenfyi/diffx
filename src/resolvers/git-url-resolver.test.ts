@@ -41,6 +41,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@github.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveGitUrlRefs(range);
@@ -69,6 +70,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "v2.0",
 				leftGitUrl: "https://github.com/owner/repo.git",
 				rightGitUrl: "https://github.com/owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveGitUrlRefs(range);
@@ -93,6 +95,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@gitlab.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveGitUrlRefs(range);
@@ -125,6 +128,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "develop",
 				leftGitUrl: "https://github.com/owner/repo.git",
 				rightGitUrl: "git@github.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const _result = await resolveGitUrlRefs(range);
@@ -143,6 +147,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@github.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveGitUrlRefs(range);
@@ -163,6 +168,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@gitlab.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveGitUrlRefs(range);
@@ -181,6 +187,7 @@ describe("resolveGitUrlRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveGitUrlRefs(range)).rejects.toThrow(DiffxError);
@@ -194,6 +201,7 @@ describe("resolveGitUrlRefs", () => {
 				type: "git-url-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveGitUrlRefs(range)).rejects.toThrow(DiffxError);
@@ -208,6 +216,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/nonexistent.git",
 				rightGitUrl: "git@github.com:owner/nonexistent.git",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -230,6 +239,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@github.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveGitUrlRefs(range)).rejects.toThrow();
@@ -242,6 +252,7 @@ describe("resolveGitUrlRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -261,6 +272,7 @@ describe("resolveGitUrlRefs", () => {
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
 				rightGitUrl: "git@github.com:owner/repo.git",
+				rangeSyntax: undefined,
 			};
 
 			try {

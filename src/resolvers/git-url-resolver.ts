@@ -44,7 +44,17 @@ export async function resolveGitUrlRefs(range: RefRange): Promise<{
 			await gitClient.fetchFromUrl(rightUrl, [`${rightRef}:${rightDestRef}`], 1);
 		}
 
-		// Return as temp refs
+		if (range.rangeSyntax === "three-dot") {
+			const mergeBase = (await gitClient.mergeBase(leftDestRef, rightDestRef)).trim();
+			return {
+				left: mergeBase,
+				right: rightDestRef,
+				cleanup: async () => {
+					await gitClient.deleteRefs([leftDestRef, rightDestRef]);
+				},
+			};
+		}
+
 		return {
 			left: leftDestRef,
 			right: rightDestRef,

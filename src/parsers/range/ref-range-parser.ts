@@ -2,14 +2,19 @@ export function parseRemoteRefRange(input: string): {
 	left: string;
 	right: string;
 	ownerRepo: string;
+	rangeSyntax: "two-dot" | "three-dot";
 } | null {
-	const separatorIndex = input.indexOf("..");
-	if (separatorIndex === -1) {
+	const separatorMatch = input.match(/\.\.\.|\.\./);
+	if (!separatorMatch || separatorMatch.index === undefined) {
 		return null;
 	}
 
+	const separatorIndex = separatorMatch.index;
+	const rangeSyntax =
+		separatorMatch[0].length === 3 ? ("three-dot" as const) : ("two-dot" as const);
+
 	const leftPart = input.slice(0, separatorIndex).trim();
-	const rightPart = input.slice(separatorIndex + 2).trim();
+	const rightPart = input.slice(separatorIndex + separatorMatch[0].length).trim();
 
 	if (!leftPart || !rightPart) {
 		return null;
@@ -46,6 +51,7 @@ export function parseRemoteRefRange(input: string): {
 			left: `${left.owner}/${left.repo}@${left.ref}`,
 			right: `${rightFull.owner}/${rightFull.repo}@${rightFull.ref}`,
 			ownerRepo: `${left.owner}/${left.repo}`,
+			rangeSyntax,
 		};
 	}
 
@@ -53,16 +59,27 @@ export function parseRemoteRefRange(input: string): {
 		left: `${left.owner}/${left.repo}@${left.ref}`,
 		right: `${left.owner}/${left.repo}@${rightPart}`,
 		ownerRepo: `${left.owner}/${left.repo}`,
+		rangeSyntax,
 	};
 }
 
-export function parseLocalRefRange(input: string): { left: string; right: string } | null {
-	const parts = input.split("..");
-	if (parts.length !== 2 || !parts[0] || !parts[1]) {
+export function parseLocalRefRange(
+	input: string,
+): { left: string; right: string; rangeSyntax: "two-dot" | "three-dot" } | null {
+	const separatorMatch = input.match(/\.\.(?:\.?)/);
+	if (!separatorMatch || separatorMatch.index === undefined) {
 		return null;
 	}
-	return {
-		left: parts[0].trim(),
-		right: parts[1].trim(),
-	};
+
+	const separatorIndex = separatorMatch.index;
+	const rangeSyntax =
+		separatorMatch[0].length === 3 ? ("three-dot" as const) : ("two-dot" as const);
+	const left = input.slice(0, separatorIndex).trim();
+	const right = input.slice(separatorIndex + separatorMatch[0].length).trim();
+
+	if (!left || !right) {
+		return null;
+	}
+
+	return { left, right, rangeSyntax };
 }

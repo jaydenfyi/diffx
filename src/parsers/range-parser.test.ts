@@ -189,6 +189,15 @@ describe("parseGitUrlRange", () => {
 			expect(result.right).toBe("owner/repo@release/2.0");
 			expect(result.ownerRepo).toBe("owner/repo");
 		});
+
+		it("should parse triple-dot remote range", () => {
+			const result = parseRangeInput("owner/repo@v1.0...v2.0");
+			expect(result.type).toBe("remote-range");
+			expect(result.left).toBe("owner/repo@v1.0");
+			expect(result.right).toBe("owner/repo@v2.0");
+			expect(result.ownerRepo).toBe("owner/repo");
+			expect(result.rangeSyntax).toBe("three-dot");
+		});
 	});
 });
 
@@ -199,6 +208,7 @@ describe("local ref ranges", () => {
 			expect(result.type).toBe("local-range");
 			expect(result.left).toBe("main");
 			expect(result.right).toBe("feature");
+			expect(result.rangeSyntax).toBe("two-dot");
 		});
 
 		it("should parse refs with slashes", () => {
@@ -227,6 +237,35 @@ describe("local ref ranges", () => {
 			expect(result.type).toBe("local-range");
 			expect(result.left).toBe("refs/heads/main");
 			expect(result.right).toBe("refs/tags/v1.0");
+		});
+
+		it("should parse triple-dot range (main...HEAD)", () => {
+			const result = parseRangeInput("main...HEAD");
+			expect(result.type).toBe("local-range");
+			expect(result.left).toBe("main");
+			expect(result.right).toBe("HEAD");
+			expect(result.rangeSyntax).toBe("three-dot");
+		});
+
+		it("should parse triple-dot range with feature branches", () => {
+			const result = parseRangeInput("main...feature/auth");
+			expect(result.type).toBe("local-range");
+			expect(result.left).toBe("main");
+			expect(result.right).toBe("feature/auth");
+		});
+
+		it("should parse triple-dot range with tags", () => {
+			const result = parseRangeInput("v1.0...v2.0");
+			expect(result.type).toBe("local-range");
+			expect(result.left).toBe("v1.0");
+			expect(result.right).toBe("v2.0");
+		});
+
+		it("should parse triple-dot range with SHAs", () => {
+			const result = parseRangeInput("abc123...def456");
+			expect(result.type).toBe("local-range");
+			expect(result.left).toBe("abc123");
+			expect(result.right).toBe("def456");
 		});
 	});
 });

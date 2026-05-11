@@ -46,6 +46,7 @@ describe("resolvePRRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -75,6 +76,7 @@ describe("resolvePRRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "octocat/Hello-World",
@@ -100,6 +102,7 @@ describe("resolvePRRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -120,6 +123,7 @@ describe("resolvePRRefs", () => {
 		it("should throw when ownerRepo is missing", async () => {
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				prNumber: 123,
@@ -132,6 +136,7 @@ describe("resolvePRRefs", () => {
 		it("should throw when prNumber is missing", async () => {
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -145,6 +150,7 @@ describe("resolvePRRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "invalid",
@@ -160,6 +166,7 @@ describe("resolvePRRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -190,6 +197,7 @@ describe("resolvePRRangeRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				leftPr: { owner: "owner", repo: "repo", prNumber: 123 },
@@ -213,6 +221,7 @@ describe("resolvePRRangeRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				leftPr: { owner: "owner", repo: "repo", prNumber: 1 },
@@ -231,6 +240,7 @@ describe("resolvePRRangeRefs", () => {
 		it("should throw when leftPr is missing", async () => {
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				rightPr: { owner: "owner", repo: "repo", prNumber: 123 },
@@ -242,6 +252,7 @@ describe("resolvePRRangeRefs", () => {
 		it("should throw when rightPr is missing", async () => {
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				leftPr: { owner: "owner", repo: "repo", prNumber: 123 },
@@ -255,6 +266,7 @@ describe("resolvePRRangeRefs", () => {
 
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				leftPr: { owner: "owner", repo: "repo", prNumber: 1 },
@@ -284,6 +296,7 @@ describe("resolveGitHubCommitRefs", () => {
 
 			const range: RefRange = {
 				type: "github-commit-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -310,6 +323,7 @@ describe("resolveGitHubCommitRefs", () => {
 
 			const range: RefRange = {
 				type: "github-commit-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -326,6 +340,7 @@ describe("resolveGitHubCommitRefs", () => {
 		it("should throw when ownerRepo is missing", async () => {
 			const range: RefRange = {
 				type: "github-commit-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				commitSha: "abc123",
@@ -337,6 +352,7 @@ describe("resolveGitHubCommitRefs", () => {
 		it("should throw when commitSha is missing", async () => {
 			const range: RefRange = {
 				type: "github-commit-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -360,6 +376,7 @@ describe("resolveGitHubPRChangesRefs", () => {
 
 			const range: RefRange = {
 				type: "github-pr-changes-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -391,6 +408,7 @@ describe("resolveGitHubPRChangesRefs", () => {
 
 			const range: RefRange = {
 				type: "github-pr-changes-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -413,6 +431,7 @@ describe("resolveGitHubPRChangesRefs", () => {
 		it("should throw when required fields are missing", async () => {
 			const range: RefRange = {
 				type: "github-pr-changes-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -441,6 +460,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -464,6 +484,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -484,6 +505,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -511,6 +533,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -539,6 +562,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -566,6 +590,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -589,6 +614,7 @@ describe("resolveGitHubCompareRefs", () => {
 
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",

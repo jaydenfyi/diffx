@@ -41,6 +41,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveRemoteRefs(range);
@@ -66,6 +67,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@v1.0.0",
 				right: "owner/repo@v2.0.0",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveRemoteRefs(range);
@@ -88,6 +90,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@release/v1",
 				right: "owner/repo@release/v2",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveRemoteRefs(range);
@@ -112,6 +115,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveRemoteRefs(range);
@@ -131,6 +135,7 @@ describe("resolveRemoteRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -144,6 +149,7 @@ describe("resolveRemoteRefs", () => {
 				type: "remote-range",
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -155,6 +161,7 @@ describe("resolveRemoteRefs", () => {
 				left: "/repo@main",
 				right: "/repo@feature",
 				ownerRepo: "/repo",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -167,6 +174,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/@main",
 				right: "owner/@feature",
 				ownerRepo: "owner/",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -181,6 +189,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo/main", // missing @
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -195,6 +204,7 @@ describe("resolveRemoteRefs", () => {
 				left: "main@feature", // wrong format
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveRemoteRefs(range)).rejects.toThrow(DiffxError);
@@ -209,6 +219,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -229,6 +240,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -246,6 +258,7 @@ describe("resolveRemoteRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -262,6 +275,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "invalid",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -280,6 +294,7 @@ describe("resolveRemoteRefs", () => {
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			try {

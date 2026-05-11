@@ -22,7 +22,6 @@ export async function resolveLocalRefs(range: RefRange): Promise<{
 	const left = normalizeRef(range.left);
 	const right = normalizeRef(range.right);
 
-	// Validate that both refs exist (branches, tags, commits, and rev expressions)
 	const leftExists = await gitClient.refExistsAny(left);
 	const rightExists = await gitClient.refExistsAny(right);
 
@@ -31,6 +30,11 @@ export async function resolveLocalRefs(range: RefRange): Promise<{
 	}
 	if (!rightExists) {
 		throw new DiffxError(`Right ref does not exist: ${range.right}`, ExitCode.INVALID_INPUT);
+	}
+
+	if (range.rangeSyntax === "three-dot") {
+		const mergeBase = (await gitClient.mergeBase(left, right)).trim();
+		return { left: mergeBase, right };
 	}
 
 	return { left, right };

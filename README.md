@@ -38,13 +38,13 @@ diffx --name-status
 
 ## `diffx` vs `git diff`
 
-| Capability | `diffx` | `git diff` |
-| ---------- | ------- | ---------- |
-| Full working tree snapshot (tracked + untracked) | ✅ | ❌ |
-| Direct GitHub PR and GitLab MR diffing | ✅ | ❌ |
-| Cross-remote and fork comparisons | ✅ | ❌ |
-| Include/exclude glob filtering | ✅ | ❌ |
-| `git diff` compatibility | ✅ | ✅ |
+| Capability                                       | `diffx` | `git diff` |
+| ------------------------------------------------ | ------- | ---------- |
+| Full working tree snapshot (tracked + untracked) | ✅      | ❌         |
+| Direct GitHub PR and GitLab MR diffing           | ✅      | ❌         |
+| Cross-remote and fork comparisons                | ✅      | ❌         |
+| Include/exclude glob filtering                   | ✅      | ❌         |
+| `git diff` compatibility                         | ✅      | ✅         |
 
 ## Command
 
@@ -123,6 +123,13 @@ diffx gitlab:owner/repo@main..feature
 # Merge request ref
 diffx gitlab:owner/repo!123
 ```
+
+### Two-dot vs three-dot
+
+All range formats support both `..` and `...` separators:
+
+- `A..B` compares the two tips directly (same as `git diff A B`)
+- `A...B` compares from the merge-base of A and B to B (same as `git diff A...B`)
 
 ## Output Modes
 

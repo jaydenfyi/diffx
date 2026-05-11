@@ -14,15 +14,17 @@ export function parseMRRef(input: string): GitLabMRUrl | null {
 
 export function parseGitlabRefRange(
 	input: string,
-): { ownerRepo: string; left: string; right: string } | null {
-	const match = /^gitlab:([^/]+)\/([^@]+)@(.+)\.\.(.+)$/i;
+): { ownerRepo: string; left: string; right: string; rangeSyntax: "two-dot" | "three-dot" } | null {
+	const match = /^gitlab:([^/]+)\/([^@]+)@(.+)(\.\.\.?)(.+)$/i;
 	const result = input.match(match);
 	if (!result) return null;
 
 	const owner = result[1];
 	const repo = result[2];
 	const left = result[3].trim();
-	const right = result[4].trim();
+	const separator = result[4];
+	const right = result[5].trim();
+	const rangeSyntax = separator.length === 3 ? ("three-dot" as const) : ("two-dot" as const);
 
 	if (!owner || !repo || !left || !right) {
 		return null;
@@ -32,5 +34,6 @@ export function parseGitlabRefRange(
 		ownerRepo: `${owner}/${repo}`,
 		left,
 		right,
+		rangeSyntax,
 	};
 }
