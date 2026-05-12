@@ -2,6 +2,8 @@
 
 <p align="center">A CLI utility for easily diffing Git changes across your working tree, local refs, remote refs, GitHub PRs, GitLab MRs, or any Git URLs.</p>
 
+<p align="center"><a href="https://www.npmjs.com/package/@jaydenfyi/diffx">npm</a> · <a href="https://github.com/jaydenfyi/diffx">GitHub</a></p>
+
 ## Quick Start
 
 ### Install
