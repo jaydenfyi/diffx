@@ -14,3 +14,6 @@ coverage/
 # Tooling
 .entire/
 .local/
+
+# AI agent instructions
+AGENTS.md
