@@ -128,10 +128,17 @@ diffx gitlab:owner/repo!123
 
 ### Two-dot vs three-dot
 
-All range formats support both `..` and `...` separators:
+`diffx` supports both `..` and `...` for ref-to-ref range inputs such as local refs, remote shorthand refs, git URL ranges, and `github:` / `gitlab:` ref ranges.
 
 - `A..B` compares the two tips directly (same as `git diff A B`)
 - `A...B` compares from the merge-base of A and B to B (same as `git diff A...B`)
+
+Some URL-based inputs use a fixed form instead:
+
+- GitHub compare URLs use `...`, e.g. `diffx https://github.com/owner/repo/compare/main...feature`
+- GitHub PR changes URLs use `..`, e.g. `diffx https://github.com/owner/repo/pull/123/changes/abc123..def456`
+- GitHub PR URLs, GitHub commit URLs, and GitLab MR refs are single-resource inputs, e.g. `diffx https://github.com/owner/repo/pull/123`, `diffx https://github.com/owner/repo/commit/abc123`, `diffx gitlab:owner/repo!123`
+- PR-to-PR inputs accept both separators, but currently treat them the same, e.g. `diffx github:owner/repo#123..github:owner/repo#456`
 
 ## Output Modes
 
