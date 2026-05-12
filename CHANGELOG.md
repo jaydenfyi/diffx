@@ -1,5 +1,11 @@
 # @jaydenfyi/diffx
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix CLI version reporting by reading from package.json instead of hardcoded value
+
 ## 0.0.2
 
 ### Patch Changes
