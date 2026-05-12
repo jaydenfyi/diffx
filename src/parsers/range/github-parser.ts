@@ -97,15 +97,17 @@ export function parsePRRef(input: string): GitHubPRUrl | null {
 
 export function parseGithubRefRange(
 	input: string,
-): { ownerRepo: string; left: string; right: string } | null {
-	const match = /^github:([^/]+)\/([^@]+)@(.+)\.\.(.+)$/i;
+): { ownerRepo: string; left: string; right: string; rangeSyntax: "two-dot" | "three-dot" } | null {
+	const match = /^github:([^/]+)\/([^@]+)@(.+)(\.\.\.?)(.+)$/i;
 	const result = input.match(match);
 	if (!result) return null;
 
 	const owner = result[1];
 	const repo = result[2];
 	const left = result[3].trim();
-	const right = result[4].trim();
+	const separator = result[4];
+	const right = result[5].trim();
+	const rangeSyntax = separator.length === 3 ? ("three-dot" as const) : ("two-dot" as const);
 
 	if (!owner || !repo || !left || !right) {
 		return null;
@@ -115,15 +117,21 @@ export function parseGithubRefRange(
 		ownerRepo: `${owner}/${repo}`,
 		left,
 		right,
+		rangeSyntax,
 	};
 }
 
 export function parsePRRange(input: string): { left: GitHubPRUrl; right: GitHubPRUrl } | null {
 	if (!input.includes("..")) return null;
-	const parts = input.split("..");
-	if (parts.length !== 2) return null;
-	const left = parseGitHubPRUrl(parts[0].trim()) ?? parsePRRef(parts[0].trim());
-	const right = parseGitHubPRUrl(parts[1].trim()) ?? parsePRRef(parts[1].trim());
+	const separatorMatch = input.match(/\.\.\.|\.\./);
+	if (!separatorMatch || separatorMatch.index === undefined) return null;
+
+	const leftStr = input.slice(0, separatorMatch.index).trim();
+	const rightStr = input.slice(separatorMatch.index + separatorMatch[0].length).trim();
+	if (!leftStr || !rightStr) return null;
+
+	const left = parseGitHubPRUrl(leftStr) ?? parsePRRef(leftStr);
+	const right = parseGitHubPRUrl(rightStr) ?? parsePRRef(rightStr);
 	if (!left || !right) return null;
 	return { left, right };
 }

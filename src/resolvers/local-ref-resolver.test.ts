@@ -13,6 +13,7 @@ import { DiffxError, ExitCode } from "../types";
 vi.mock("../git/git-client", () => ({
 	gitClient: {
 		refExistsAny: vi.fn(),
+		mergeBase: vi.fn(),
 	},
 }));
 
@@ -22,6 +23,7 @@ vi.mock("../git/utils", () => ({
 
 describe("resolveLocalRefs", () => {
 	const mockRefExistsAny = mockedFn(gitClient.refExistsAny);
+	const mockMergeBase = mockedFn(gitClient.mergeBase);
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -37,6 +39,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveLocalRefs(range);
@@ -56,6 +59,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "refs/heads/main",
 				right: "refs/tags/v1.0",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveLocalRefs(range);
@@ -73,6 +77,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "abc123",
 				right: "def456",
+				rangeSyntax: undefined,
 			};
 
 			const result = await resolveLocalRefs(range);
@@ -80,6 +85,45 @@ describe("resolveLocalRefs", () => {
 			expect(result).toEqual({
 				left: "abc123",
 				right: "def456",
+			});
+		});
+
+		it("should compute merge-base for triple-dot range", async () => {
+			mockRefExistsAny.mockResolvedValue(true);
+			mockMergeBase.mockResolvedValue("mergebase456\n");
+
+			const range: RefRange = {
+				type: "local-range",
+				left: "main",
+				right: "feature",
+				rangeSyntax: "three-dot",
+			};
+
+			const result = await resolveLocalRefs(range);
+
+			expect(mockMergeBase).toHaveBeenCalledWith("main", "feature");
+			expect(result).toEqual({
+				left: "mergebase456",
+				right: "feature",
+			});
+		});
+
+		it("should not compute merge-base for double-dot range", async () => {
+			mockRefExistsAny.mockResolvedValue(true);
+
+			const range: RefRange = {
+				type: "local-range",
+				left: "main",
+				right: "feature",
+				rangeSyntax: "two-dot",
+			};
+
+			const result = await resolveLocalRefs(range);
+
+			expect(mockMergeBase).not.toHaveBeenCalled();
+			expect(result).toEqual({
+				left: "main",
+				right: "feature",
 			});
 		});
 	});
@@ -91,6 +135,7 @@ describe("resolveLocalRefs", () => {
 				left: "main",
 				right: "feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveLocalRefs(range)).rejects.toThrow(DiffxError);
@@ -106,6 +151,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "nonexistent",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveLocalRefs(range)).rejects.toThrow(DiffxError);
@@ -121,6 +167,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "main",
 				right: "nonexistent",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveLocalRefs(range)).rejects.toThrow(DiffxError);
@@ -136,6 +183,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "nonexistent1",
 				right: "nonexistent2",
+				rangeSyntax: undefined,
 			};
 
 			await expect(resolveLocalRefs(range)).rejects.toThrow(DiffxError);
@@ -152,6 +200,7 @@ describe("resolveLocalRefs", () => {
 				left: "main",
 				right: "feature",
 				ownerRepo: "owner/repo",
+				rangeSyntax: undefined,
 			};
 
 			try {
@@ -170,6 +219,7 @@ describe("resolveLocalRefs", () => {
 				type: "local-range",
 				left: "missing",
 				right: "feature",
+				rangeSyntax: undefined,
 			};
 
 			try {

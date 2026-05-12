@@ -10,22 +10,26 @@ Use this skill to translate a diffing request into the right `diffx` command.
 ## Decision Flow
 
 1. Classify the target.
+
 - Current repo changes only -> load `references/worktree.md`.
 - Two refs/branches/tags/SHAs -> load `references/local-and-remote-ranges.md`.
 - GitHub PR/commit/compare URL or `github:owner/repo#123` -> load `references/github-and-gitlab.md`.
 - GitLab MR (`gitlab:owner/repo!123`) -> load `references/github-and-gitlab.md`.
 
 2. Choose output shape.
+
 - Full code review output -> `diff` (default).
 - Apply-ready output -> `--mode patch`.
 - Summary output -> `--stat`, `--numstat`, `--shortstat`, `--name-only`, `--name-status`, or `--summary`.
 - Custom table output -> `--overview` only.
 
 3. Apply optional narrowing.
+
 - File globs -> load `references/filters-and-pass-through.md`.
 - Native git diff flags/pathspec -> load `references/filters-and-pass-through.md`.
 
 4. Handle failures/conflicts.
+
 - Unexpected empty output, invalid input, or flag conflicts -> load `references/troubleshooting.md`.
 
 ## Defaults

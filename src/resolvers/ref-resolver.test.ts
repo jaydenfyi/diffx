@@ -105,6 +105,7 @@ describe("resolveRefs", () => {
 		it("should route local-range to resolveLocalRefs", async () => {
 			const range: RefRange = {
 				type: "local-range",
+				rangeSyntax: undefined,
 				left: "main",
 				right: "feature",
 			};
@@ -118,6 +119,7 @@ describe("resolveRefs", () => {
 		it("should route remote-range to resolveRemoteRefs", async () => {
 			const range: RefRange = {
 				type: "remote-range",
+				rangeSyntax: undefined,
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
@@ -132,6 +134,7 @@ describe("resolveRefs", () => {
 		it("should route pr-ref to resolvePRRefs", async () => {
 			const range: RefRange = {
 				type: "pr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -147,6 +150,7 @@ describe("resolveRefs", () => {
 		it("should route github-url to resolvePRRefs", async () => {
 			const range: RefRange = {
 				type: "github-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -161,6 +165,7 @@ describe("resolveRefs", () => {
 		it("should route pr-range to resolvePRRangeRefs", async () => {
 			const range: RefRange = {
 				type: "pr-range",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				leftPr: { owner: "owner", repo: "repo", prNumber: 123 },
@@ -176,6 +181,7 @@ describe("resolveRefs", () => {
 		it("should route git-url-range to resolveGitUrlRefs", async () => {
 			const range: RefRange = {
 				type: "git-url-range",
+				rangeSyntax: undefined,
 				left: "main",
 				right: "feature",
 				leftGitUrl: "git@github.com:owner/repo.git",
@@ -191,6 +197,7 @@ describe("resolveRefs", () => {
 		it("should route github-commit-url to resolveGitHubCommitRefs", async () => {
 			const range: RefRange = {
 				type: "github-commit-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -206,6 +213,7 @@ describe("resolveRefs", () => {
 		it("should route github-pr-changes-url to resolveGitHubPRChangesRefs", async () => {
 			const range: RefRange = {
 				type: "github-pr-changes-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -223,6 +231,7 @@ describe("resolveRefs", () => {
 		it("should route github-compare-url to resolveGitHubCompareRefs", async () => {
 			const range: RefRange = {
 				type: "github-compare-url",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -239,6 +248,7 @@ describe("resolveRefs", () => {
 		it("should route gitlab-mr-ref to resolveGitLabMRRefs", async () => {
 			const range: RefRange = {
 				type: "gitlab-mr-ref",
+				rangeSyntax: undefined,
 				left: "",
 				right: "",
 				ownerRepo: "owner/repo",
@@ -270,6 +280,7 @@ describe("resolveRefs", () => {
 			for (const type of refTypes) {
 				const range: RefRange = {
 					type,
+					rangeSyntax: undefined,
 					left: "main",
 					right: "feature",
 				};
@@ -287,6 +298,7 @@ describe("resolveRefs", () => {
 
 			const range: RefRange = {
 				type: "local-range",
+				rangeSyntax: undefined,
 				left: "main",
 				right: "feature",
 			};
@@ -299,6 +311,7 @@ describe("resolveRefs", () => {
 
 			const range: RefRange = {
 				type: "remote-range",
+				rangeSyntax: undefined,
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
@@ -319,6 +332,7 @@ describe("resolveRefs", () => {
 
 			const range: RefRange = {
 				type: "remote-range",
+				rangeSyntax: undefined,
 				left: "owner/repo@main",
 				right: "owner/repo@feature",
 				ownerRepo: "owner/repo",
@@ -337,6 +351,7 @@ describe("resolveRefs", () => {
 		it("should not return cleanup for local refs", async () => {
 			const range: RefRange = {
 				type: "local-range",
+				rangeSyntax: undefined,
 				left: "main",
 				right: "feature",
 			};

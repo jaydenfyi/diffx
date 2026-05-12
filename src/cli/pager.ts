@@ -151,7 +151,9 @@ async function runPager(command: string, output: string): Promise<void> {
 			env: { ...process.env, ...env },
 		});
 
-		child.on("error", (error) => rejectOnce(error instanceof Error ? error : new Error(String(error))));
+		child.on("error", (error) =>
+			rejectOnce(error instanceof Error ? error : new Error(String(error))),
+		);
 		child.on("exit", (code) => {
 			if (code && code !== 0) {
 				rejectOnce(new Error(`Pager exited with code ${code}`));

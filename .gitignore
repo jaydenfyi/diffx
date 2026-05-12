@@ -10,4 +10,10 @@ coverage/
 # IDE
 .vscode/
 .claude/
+
+# Tooling
 .entire/
+.local/
+
+# AI agent instructions
+AGENTS.md
