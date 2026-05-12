@@ -1,6 +1,6 @@
 {
 	"name": "@jaydenfyi/diffx",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "A CLI tool for generating filtered Git diffs/patches with GitHub PR support",
 	"keywords": [
 		"cli",
