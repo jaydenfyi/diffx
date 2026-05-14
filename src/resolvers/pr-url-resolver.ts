@@ -4,33 +4,118 @@
  */
 
 import type { GitHubPRUrl, RefRange } from "../types";
+import type { GitClient } from "../git/git-client";
 import { gitClient } from "../git/git-client";
+import { createTemporaryGitClient } from "../git/temp-git-repo";
 import { buildGitHubUrl, createTempRefPrefix } from "../git/utils";
 import { DiffxError, ExitCode } from "../types";
 
 type PRResolvedRefs = {
 	headRef: string;
-	mergeRef: string;
+	leftRef: string;
+	rightRef: string;
 	cleanupRefs: string[];
 };
 
+type GitHubPRMetadata = {
+	baseRef: string;
+	mergeCommitSha?: string;
+};
+
+async function fetchGitHubPRMetadata(
+	owner: string,
+	repo: string,
+	prNumber: number,
+): Promise<GitHubPRMetadata> {
+	const headers: Record<string, string> = {
+		Accept: "application/vnd.github+json",
+		"User-Agent": "diffx",
+	};
+	const token = process.env.GITHUB_TOKEN;
+	if (token) {
+		headers.Authorization = `Bearer ${token}`;
+	}
+
+	const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}`, {
+		headers,
+	});
+	if (!response.ok) {
+		throw new Error(`GitHub PR metadata request failed: ${response.status}`);
+	}
+
+	const data = (await response.json()) as {
+		base?: { ref?: string };
+		merge_commit_sha?: string | null;
+	};
+	if (!data.base?.ref) {
+		throw new Error("GitHub PR metadata response did not include base ref");
+	}
+
+	return {
+		baseRef: data.base.ref,
+		mergeCommitSha: data.merge_commit_sha ?? undefined,
+	};
+}
+
 async function fetchPRRefs(pr: GitHubPRUrl, tempPrefix: string): Promise<PRResolvedRefs> {
+	return fetchPRRefsWithClient(pr, tempPrefix, gitClient);
+}
+
+async function fetchPRRefsWithClient(
+	pr: GitHubPRUrl,
+	tempPrefix: string,
+	client: GitClient,
+): Promise<PRResolvedRefs> {
 	const { owner, repo, prNumber } = pr;
 	const remoteUrl = buildGitHubUrl(owner, repo);
 
 	const headRef = `${tempPrefix}/pull/${prNumber}/head`;
 	const mergeRef = `${tempPrefix}/pull/${prNumber}/merge`;
+	const baseRef = `${tempPrefix}/pull/${prNumber}/base`;
 
-	await gitClient.fetchFromUrl(
-		remoteUrl,
-		[`refs/pull/${prNumber}/head:${headRef}`, `refs/pull/${prNumber}/merge:${mergeRef}`],
-		2,
-	);
+	try {
+		await client.fetchFromUrl(
+			remoteUrl,
+			[`refs/pull/${prNumber}/head:${headRef}`, `refs/pull/${prNumber}/merge:${mergeRef}`],
+			2,
+		);
+
+		return {
+			headRef,
+			leftRef: `${mergeRef}^1`,
+			rightRef: mergeRef,
+			cleanupRefs: [headRef, mergeRef],
+		};
+	} catch (error) {
+		if (
+			!(error as Error).message.includes("refs/pull") ||
+			!(error as Error).message.includes("merge")
+		) {
+			throw error;
+		}
+	}
+
+	const metadata = await fetchGitHubPRMetadata(owner, repo, prNumber);
+
+	if (metadata.mergeCommitSha) {
+		await client.fetchFromUrl(remoteUrl, [`${metadata.mergeCommitSha}:${mergeRef}`], 2);
+
+		return {
+			headRef,
+			leftRef: `${mergeRef}^1`,
+			rightRef: mergeRef,
+			cleanupRefs: [mergeRef],
+		};
+	}
+
+	await client.fetchFromUrl(remoteUrl, [`refs/heads/${metadata.baseRef}:${baseRef}`], 200);
+	await client.fetchFromUrl(remoteUrl, [`refs/pull/${prNumber}/head:${headRef}`], 200);
 
 	return {
 		headRef,
-		mergeRef,
-		cleanupRefs: [headRef, mergeRef],
+		leftRef: baseRef,
+		rightRef: headRef,
+		cleanupRefs: [headRef, baseRef],
 	};
 }
 
@@ -41,6 +126,7 @@ export async function resolvePRRefs(range: RefRange): Promise<{
 	left: string;
 	right: string;
 	cleanup?: () => Promise<void>;
+	gitClient?: GitClient;
 }> {
 	if (!range.ownerRepo || range.prNumber === undefined) {
 		throw new DiffxError("Invalid PR ref", ExitCode.INVALID_INPUT);
@@ -52,16 +138,22 @@ export async function resolvePRRefs(range: RefRange): Promise<{
 			throw new DiffxError(`Invalid owner/repo: ${range.ownerRepo}`, ExitCode.INVALID_INPUT);
 		}
 
+		const tempRepo = await createTemporaryGitClient();
 		const tempPrefix = createTempRefPrefix();
-		const refs = await fetchPRRefs({ owner, repo, prNumber: range.prNumber }, tempPrefix);
+		const refs = await fetchPRRefsWithClient(
+			{ owner, repo, prNumber: range.prNumber },
+			tempPrefix,
+			tempRepo.gitClient,
+		);
 
 		// The merge ref is the PR head merged into the base branch
 		// Diffing merge^1..merge yields the PR changes (mirrors GitHub "Files changed")
 		return {
-			left: `${refs.mergeRef}^1`, // The first parent of the merge commit (the base branch)
-			right: refs.mergeRef,
+			left: refs.leftRef,
+			right: refs.rightRef,
+			gitClient: tempRepo.gitClient,
 			cleanup: async () => {
-				await gitClient.deleteRefs(refs.cleanupRefs);
+				await tempRepo.cleanup();
 			},
 		};
 	} catch (error) {

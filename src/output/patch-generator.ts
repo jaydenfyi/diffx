@@ -4,6 +4,7 @@
  */
 
 import type { GitDiffOptions } from "../git/types";
+import type { GitClient } from "../git/git-client";
 import { gitClient } from "../git/git-client";
 import type { PatchStyle } from "../types";
 
@@ -15,10 +16,11 @@ export async function generatePatch(
 	right: string,
 	options: GitDiffOptions | undefined,
 	patchStyle: PatchStyle = "diff",
+	client: GitClient = gitClient,
 ): Promise<string> {
 	if (patchStyle === "diff") {
-		return gitClient.diff(left, right, options);
+		return client.diff(left, right, options);
 	}
 
-	return gitClient.formatPatch(left, right, options);
+	return client.formatPatch(left, right, options);
 }

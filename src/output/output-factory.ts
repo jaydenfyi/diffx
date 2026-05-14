@@ -4,6 +4,7 @@
  */
 
 import type { OutputMode, PatchStyle } from "../types";
+import type { GitClient } from "../git/git-client";
 import { gitClient } from "../git/git-client";
 import { generatePatch } from "./patch-generator";
 import { GitDiffOptions } from "../git/types";
@@ -13,24 +14,50 @@ type OutputGeneratorFn = (
 	right: string,
 	options: GitDiffOptions | undefined,
 	patchStyle?: PatchStyle,
+	client?: GitClient,
 ) => Promise<string>;
 
 const outputGeneratorsByMode = {
-	diff: (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diff(left, right, options),
+	diff: (left: string, right: string, options: GitDiffOptions | undefined, _patchStyle, client) =>
+		(client ?? gitClient).diff(left, right, options),
 	patch: generatePatch as OutputGeneratorFn,
-	stat: (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffStat(left, right, options),
-	numstat: (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNumStat(left, right, options),
-	shortstat: (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffShortStat(left, right, options),
-	"name-only": (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNameOnly(left, right, options),
-	"name-status": (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNameStatus(left, right, options),
-	summary: (left: string, right: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffSummary(left, right, options),
+	stat: (left: string, right: string, options: GitDiffOptions | undefined, _patchStyle, client) =>
+		(client ?? gitClient).diffStat(left, right, options),
+	numstat: (
+		left: string,
+		right: string,
+		options: GitDiffOptions | undefined,
+		_patchStyle,
+		client,
+	) => (client ?? gitClient).diffNumStat(left, right, options),
+	shortstat: (
+		left: string,
+		right: string,
+		options: GitDiffOptions | undefined,
+		_patchStyle,
+		client,
+	) => (client ?? gitClient).diffShortStat(left, right, options),
+	"name-only": (
+		left: string,
+		right: string,
+		options: GitDiffOptions | undefined,
+		_patchStyle,
+		client,
+	) => (client ?? gitClient).diffNameOnly(left, right, options),
+	"name-status": (
+		left: string,
+		right: string,
+		options: GitDiffOptions | undefined,
+		_patchStyle,
+		client,
+	) => (client ?? gitClient).diffNameStatus(left, right, options),
+	summary: (
+		left: string,
+		right: string,
+		options: GitDiffOptions | undefined,
+		_patchStyle,
+		client,
+	) => (client ?? gitClient).diffSummary(left, right, options),
 } as const satisfies Record<OutputMode, OutputGeneratorFn>;
 
 type OutputGeneratorAgainstWorktreeFn = (
@@ -66,9 +93,10 @@ export async function generateOutput(
 	right: string,
 	options: GitDiffOptions | undefined,
 	patchStyle: PatchStyle | undefined,
+	client?: GitClient,
 ): Promise<string> {
 	const generator = outputGeneratorsByMode[mode];
-	return generator(left, right, options, patchStyle);
+	return generator(left, right, options, patchStyle, client);
 }
 
 /**
