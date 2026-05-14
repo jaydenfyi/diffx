@@ -38,19 +38,6 @@ export function buildFilePatterns(options: FilterOptions): string[] {
 }
 
 /**
- * Check if a file path matches the given patterns
- */
-export function fileMatchesPattern(filePath: string, pattern: string): boolean {
-	// Handle negative patterns
-	if (pattern.startsWith(":!")) {
-		const negPattern = pattern.slice(2);
-		return !minimatch(filePath, negPattern, { dot: true });
-	}
-
-	return minimatch(filePath, pattern, { dot: true });
-}
-
-/**
  * Check if a file should be included based on filter options
  */
 export function shouldIncludeFile(filePath: string, options: FilterOptions): boolean {

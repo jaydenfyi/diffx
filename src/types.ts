@@ -122,12 +122,6 @@ export interface DiffxOptions {
 	exclude?: string | string[];
 }
 
-/** Git operation result */
-export interface GitResult {
-	stdout: string;
-	exitCode: number;
-}
-
 /** Error types with exit codes */
 export const ExitCode = {
 	SUCCESS: 0,

@@ -1,12 +1,12 @@
 import type { GitDiffOptions } from "../git/types";
 import { buildFilePatterns } from "../filters/file-filter";
-import { DiffxError, ExitCode, type OutputMode } from "../types";
+import { DiffxError, ExitCode, type FilterOptions, type OutputMode } from "../types";
 import {
 	type PartitionedArgs,
 	isGitOutputFormatFlag,
 	validateOverviewMutualExclusivity,
+	parseFlagName,
 } from "./arg-partitioner";
-import type { CliToken, FileFilterOptions } from "./command-types";
 
 const MODES = new Set([
 	"diff",
@@ -18,17 +18,6 @@ const MODES = new Set([
 	"name-status",
 	"summary",
 ] as const);
-
-function parseFlagName(arg: string): string {
-	if (arg.startsWith("--")) {
-		const idx = arg.indexOf("=");
-		return idx >= 0 ? arg.slice(0, idx) : arg;
-	}
-	if (arg.startsWith("-") && arg.length > 1) {
-		return arg.slice(0, 2);
-	}
-	return arg;
-}
 
 function parseMode(value: unknown): OutputMode | null {
 	if (typeof value !== "string") {
@@ -46,12 +35,6 @@ export function validateNoConflictingFlags(
 	diffxFlags: Map<string, unknown>,
 	gitArgs: string[],
 ): void {
-	const pager = diffxFlags.get("--pager");
-	const noPager = diffxFlags.get("--no-pager");
-	if (pager && noPager) {
-		throw new DiffxError("Cannot use both --pager and --no-pager", ExitCode.INVALID_INPUT);
-	}
-
 	validateOverviewMutualExclusivity(diffxFlags, gitArgs);
 }
 
@@ -172,16 +155,10 @@ export function getRangeOrUrl(
 	);
 }
 
-export function validatePagerOptions(
-	pager: boolean | undefined,
-	noPager: boolean | undefined,
-): void {
-	if (pager && noPager) {
-		throw new DiffxError("Cannot use both --pager and --no-pager", ExitCode.INVALID_INPUT);
-	}
-}
-
-export function hasLongOptionFlag(tokens: CliToken[], optionName: string): boolean {
+export function hasLongOptionFlag(
+	tokens: { kind: string; name?: string }[],
+	optionName: string,
+): boolean {
 	let seenOptionTerminator = false;
 	for (const token of tokens) {
 		if (token.kind === "option-terminator") {
@@ -204,7 +181,7 @@ export function getFilterOptions({
 }: {
 	include: string | string[] | undefined;
 	exclude: string | string[] | undefined;
-}): FileFilterOptions {
+}): FilterOptions {
 	const normalize = (value: string | string[] | undefined): string[] | undefined => {
 		if (!value) return undefined;
 		return Array.isArray(value) ? value : [value];
@@ -217,7 +194,7 @@ export function getFilterOptions({
 }
 
 export function buildDiffOptions(
-	filterOptions: FileFilterOptions,
+	filterOptions: FilterOptions,
 	pager: boolean | undefined,
 	mode: OutputMode,
 	extraGitArgs: string[] = [],
@@ -237,6 +214,6 @@ export function buildDiffOptions(
 	};
 }
 
-export function hasActiveFilters(filterOptions: FileFilterOptions): boolean {
+export function hasActiveFilters(filterOptions: FilterOptions): boolean {
 	return Boolean(filterOptions.include?.length || filterOptions.exclude?.length);
 }

@@ -235,10 +235,3 @@ function formatStatLine(line: string, alignWidth?: number): string {
 	const fileCol = fileWithLead.padEnd(width);
 	return `${fileCol} |${rightPart}`;
 }
-
-export function formatStatOutput(output: string, alignWidth: number): string {
-	return output
-		.split("\n")
-		.map((line) => (line.includes("|") ? formatStatLine(line, alignWidth) : line))
-		.join("\n");
-}

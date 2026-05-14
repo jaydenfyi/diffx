@@ -9,7 +9,6 @@ import {
 	buildStatusMapForWorktree,
 	buildStatusMapForRange,
 	formatNumstatOutput,
-	formatStatOutput,
 } from "./overview-utils";
 import type { OutputMode } from "../types";
 import { gitClient } from "../git/git-client";
@@ -350,37 +349,6 @@ describe("formatNumstatOutput", () => {
 		expect(lines[0]).toContain("FILE"); // Header
 		expect(lines[1]).toContain("super-long-file-name-for-testing.ts");
 		expect(lines[2]).toContain(".txt");
-	});
-});
-
-describe("formatStatOutput", () => {
-	it("should format stat output with alignment", () => {
-		const output = " src/file.txt | 5 +++\n src/other.txt | 2 --";
-
-		const result = formatStatOutput(output, 30);
-
-		expect(result).toContain("src/file.txt");
-		expect(result).toContain("src/other.txt");
-	});
-
-	it("should pass through summary lines", () => {
-		const output = " 1 file changed, 5 insertions(+)\n src/file.txt | 5 +++";
-
-		const result = formatStatOutput(output, 30);
-
-		expect(result).toContain("1 file changed");
-	});
-
-	it("should clean /dev/null from file paths", () => {
-		const output = "/dev/null => newfile.txt | 5 +++\n oldfile.txt => /dev/null | 2 --";
-
-		const result = formatStatOutput(output, 30);
-
-		// /dev/null is removed from newfile.txt side but remains in oldfile.txt side
-		expect(result).toContain("newfile.txt");
-		expect(result).toContain("oldfile.txt");
-		// The function only removes "/dev/null => " prefix, not " => /dev/null" suffix
-		expect(result).toContain("=> /dev/null");
 	});
 });
 

@@ -1,7 +1,3 @@
-/**
- * Public library API for diffx
- */
-
 export { diffxCommand } from "./cli/command";
 export { parseRangeInput } from "./parsers/range-parser";
 export { resolveRefs } from "./resolvers/ref-resolver";

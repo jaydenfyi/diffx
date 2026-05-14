@@ -312,17 +312,6 @@ export class GitClient {
 	}
 
 	/**
-	 * Fetch a specific PR reference (without depth limit to get merge history)
-	 */
-	async fetchPR(remote: string, prNumber: number): Promise<void> {
-		// Fetch PR refs into remote-tracking refs so they can be referenced later.
-		// Use a small depth to include merge parents (merge^1, merge^2).
-		const headRef = `refs/pull/${prNumber}/head:refs/remotes/${remote}/pull/${prNumber}/head`;
-		const mergeRef = `refs/pull/${prNumber}/merge:refs/remotes/${remote}/pull/${prNumber}/merge`;
-		await this.git.raw(["fetch", "--no-tags", "--depth", "2", remote, headRef, mergeRef]);
-	}
-
-	/**
 	 * Delete refs if they exist
 	 */
 	async deleteRefs(refs: string[]): Promise<void> {
@@ -556,18 +545,6 @@ export class GitClient {
 	}
 
 	/**
-	 * Validate that two refs can be diffed
-	 */
-	async validateRefs(left: string, right: string): Promise<boolean> {
-		try {
-			await this.git.diff([`${left}..${right}`]);
-			return true;
-		} catch {
-			return false;
-		}
-	}
-
-	/**
 	 * Run native git diff with raw arguments
 	 * This is the primary method for git diff pass-through compatibility
 	 *
@@ -577,28 +554,14 @@ export class GitClient {
 	 */
 	async runGitDiffRaw(
 		args: string[],
-		options: { capture?: boolean } = {},
 	): Promise<{ stdout: string; stderr: string; exitCode: number }> {
-		const { capture = true } = options;
-
-		// Detect TTY for color output
 		const isTTY = process.stdout.isTTY;
 		const colorArgs = isTTY ? ["--color=always"] : ["--color=never"];
 
 		try {
-			// Build the full command: git diff <color> <args>
 			const fullArgs = ["diff", ...colorArgs, ...args];
-
-			if (capture) {
-				// Capture mode: return output as string
-				const stdout = await this.git.raw(fullArgs);
-				return { stdout, stderr: "", exitCode: 0 };
-			} else {
-				// Streaming mode: for future TTY/pager support
-				// For now, we still capture but this allows for future streaming implementation
-				const stdout = await this.git.raw(fullArgs);
-				return { stdout, stderr: "", exitCode: 0 };
-			}
+			const stdout = await this.git.raw(fullArgs);
+			return { stdout, stderr: "", exitCode: 0 };
 		} catch (error) {
 			// Handle git errors (e.g., bad refs, invalid options)
 			if (error instanceof Error) {

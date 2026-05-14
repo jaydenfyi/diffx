@@ -334,6 +334,7 @@ describe("diffxCommand", () => {
 
 	describe("pager conflict validation", () => {
 		it("should throw when both --pager and --no-pager are set", async () => {
+			process.argv = ["node", "diffx", "--pager", "--no-pager"];
 			mockContext.values = { pager: true, "no-pager": true };
 
 			await expect(diffxCommand.run(mockContext)).rejects.toThrow(DiffxError);
