@@ -4,6 +4,7 @@
  */
 
 import type { RefRange, RefType } from "../types";
+import type { GitClient } from "../git/git-client";
 import { resolveLocalRefs } from "./local-ref-resolver";
 import { resolveRemoteRefs } from "./remote-ref-resolver";
 import {
@@ -33,6 +34,7 @@ const resolversByRefRangeType = {
 		left: string;
 		right: string;
 		cleanup?: () => Promise<void>;
+		gitClient?: GitClient;
 	}>
 >;
 /**
@@ -42,6 +44,7 @@ export async function resolveRefs(range: RefRange): Promise<{
 	left: string;
 	right: string;
 	cleanup?: () => Promise<void>;
+	gitClient?: GitClient;
 }> {
 	const resolver = resolversByRefRangeType[range.type];
 

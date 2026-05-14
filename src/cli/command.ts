@@ -73,6 +73,9 @@ async function generateDiffOutput(
 ): Promise<string> {
 	const { left, right, patchStyle } = refs;
 	if (right) {
+		if (refs.gitClient) {
+			return generateOutput(mode, left, right, diffOptions, patchStyle, refs.gitClient);
+		}
 		return generateOutput(mode, left, right, diffOptions, patchStyle);
 	}
 

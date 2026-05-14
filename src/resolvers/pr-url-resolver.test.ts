@@ -15,6 +15,23 @@ import { gitClient } from "../git/git-client";
 import type { RefRange } from "../types";
 import { DiffxError, ExitCode } from "../types";
 
+const tempRepoMocks = vi.hoisted(() => {
+	const tempGitClient = {
+		fetchFromUrl: vi.fn(),
+		deleteRefs: vi.fn(),
+		mergeBase: vi.fn(),
+	};
+
+	return {
+		tempGitClient,
+		cleanupTempRepo: vi.fn(),
+		createTemporaryGitClient: vi.fn(async () => ({
+			gitClient: tempGitClient,
+			cleanup: vi.fn(),
+		})),
+	};
+});
+
 // Mock dependencies
 vi.mock("../git/git-client", () => ({
 	gitClient: {
@@ -29,20 +46,34 @@ vi.mock("../git/utils", () => ({
 	createTempRefPrefix: () => "refs/diffx/tmp/pr-test",
 }));
 
+vi.mock("../git/temp-git-repo", () => ({
+	createTemporaryGitClient: tempRepoMocks.createTemporaryGitClient,
+}));
+
 const mockFetchFromUrl = mockedFn(gitClient.fetchFromUrl);
 const mockDeleteRefs = mockedFn(gitClient.deleteRefs);
 const mockMergeBase = mockedFn(gitClient.mergeBase);
+const mockTempFetchFromUrl = mockedFn(tempRepoMocks.tempGitClient.fetchFromUrl);
+const mockTempDeleteRefs = mockedFn(tempRepoMocks.tempGitClient.deleteRefs);
+const mockCreateTemporaryGitClient = mockedFn(tempRepoMocks.createTemporaryGitClient);
 
 describe("resolvePRRefs", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 
 		mockDeleteRefs.mockResolvedValue(undefined);
+		mockTempDeleteRefs.mockResolvedValue(undefined);
+		mockTempFetchFromUrl.mockResolvedValue(undefined);
+		tempRepoMocks.cleanupTempRepo.mockResolvedValue(undefined);
+		mockCreateTemporaryGitClient.mockResolvedValue({
+			gitClient: tempRepoMocks.tempGitClient,
+			cleanup: tempRepoMocks.cleanupTempRepo,
+		});
 	});
 
 	describe("happy path", () => {
-		it("should resolve PR refs using merge ref logic", async () => {
-			mockFetchFromUrl.mockResolvedValue(undefined);
+		it("should resolve PR refs using an isolated git client", async () => {
+			mockTempFetchFromUrl.mockResolvedValue(undefined);
 
 			const range: RefRange = {
 				type: "pr-ref",
@@ -55,7 +86,8 @@ describe("resolvePRRefs", () => {
 
 			const result = await resolvePRRefs(range);
 
-			expect(mockFetchFromUrl).toHaveBeenCalledWith(
+			expect(mockFetchFromUrl).not.toHaveBeenCalled();
+			expect(mockTempFetchFromUrl).toHaveBeenCalledWith(
 				"https://github.com/owner/repo.git",
 				[
 					"refs/pull/123/head:refs/diffx/tmp/pr-test/pull/123/head",
@@ -67,13 +99,12 @@ describe("resolvePRRefs", () => {
 			expect(result).toEqual({
 				left: "refs/diffx/tmp/pr-test/pull/123/merge^1", // First parent of merge
 				right: "refs/diffx/tmp/pr-test/pull/123/merge",
+				gitClient: tempRepoMocks.tempGitClient,
 				cleanup: expect.any(Function),
 			});
 		});
 
 		it("should handle PR from different owner", async () => {
-			mockFetchFromUrl.mockResolvedValue(undefined);
-
 			const range: RefRange = {
 				type: "pr-ref",
 				rangeSyntax: undefined,
@@ -85,7 +116,7 @@ describe("resolvePRRefs", () => {
 
 			const result = await resolvePRRefs(range);
 
-			expect(mockFetchFromUrl).toHaveBeenCalledWith(
+			expect(mockTempFetchFromUrl).toHaveBeenCalledWith(
 				"https://github.com/octocat/Hello-World.git",
 				[
 					"refs/pull/456/head:refs/diffx/tmp/pr-test/pull/456/head",
@@ -97,9 +128,43 @@ describe("resolvePRRefs", () => {
 			expect(result.right).toContain("merge");
 		});
 
-		it("should call cleanup to delete temp refs", async () => {
-			mockFetchFromUrl.mockResolvedValue(undefined);
+		it("should fall back to merged commit metadata when GitHub has no PR merge ref", async () => {
+			mockTempFetchFromUrl
+				.mockRejectedValueOnce(new Error("couldn't find remote ref refs/pull/123/merge"))
+				.mockResolvedValueOnce(undefined);
+			vi.stubGlobal(
+				"fetch",
+				vi.fn(async () => ({
+					ok: true,
+					json: async () => ({
+						base: { ref: "main" },
+						merge_commit_sha: "merge-sha",
+					}),
+				})),
+			);
 
+			const range: RefRange = {
+				type: "pr-ref",
+				rangeSyntax: undefined,
+				left: "",
+				right: "",
+				ownerRepo: "owner/repo",
+				prNumber: 123,
+			};
+
+			const result = await resolvePRRefs(range);
+
+			expect(mockTempFetchFromUrl).toHaveBeenNthCalledWith(
+				2,
+				"https://github.com/owner/repo.git",
+				["merge-sha:refs/diffx/tmp/pr-test/pull/123/merge"],
+				2,
+			);
+			expect(result.left).toBe("refs/diffx/tmp/pr-test/pull/123/merge^1");
+			expect(result.right).toBe("refs/diffx/tmp/pr-test/pull/123/merge");
+		});
+
+		it("should call cleanup to remove the temp repo", async () => {
 			const range: RefRange = {
 				type: "pr-ref",
 				rangeSyntax: undefined,
@@ -112,10 +177,8 @@ describe("resolvePRRefs", () => {
 			const result = await resolvePRRefs(range);
 			await result.cleanup!();
 
-			expect(mockDeleteRefs).toHaveBeenCalledWith([
-				"refs/diffx/tmp/pr-test/pull/123/head",
-				"refs/diffx/tmp/pr-test/pull/123/merge",
-			]);
+			expect(tempRepoMocks.cleanupTempRepo).toHaveBeenCalled();
+			expect(mockDeleteRefs).not.toHaveBeenCalled();
 		});
 	});
 
@@ -162,7 +225,7 @@ describe("resolvePRRefs", () => {
 		});
 
 		it("should wrap fetch errors", async () => {
-			mockFetchFromUrl.mockRejectedValue(new Error("PR not found"));
+			mockTempFetchFromUrl.mockRejectedValue(new Error("PR not found"));
 
 			const range: RefRange = {
 				type: "pr-ref",
@@ -179,6 +242,7 @@ describe("resolvePRRefs", () => {
 			} catch (error) {
 				expect((error as DiffxError).message).toContain("Failed to fetch PR refs");
 				expect((error as DiffxError).exitCode).toBe(ExitCode.GIT_ERROR);
+				expect(tempRepoMocks.cleanupTempRepo).toHaveBeenCalled();
 			}
 		});
 	});

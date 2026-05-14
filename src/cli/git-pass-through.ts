@@ -19,6 +19,7 @@ export async function runGitPassThrough({
 	noPager: boolean | undefined;
 }): Promise<void> {
 	let cleanup: (() => Promise<void>) | undefined;
+	let diffGitClient = gitClient;
 
 	let left = "";
 	let right = "";
@@ -46,6 +47,7 @@ export async function runGitPassThrough({
 			left = resolved.left;
 			right = resolved.right;
 			cleanup = resolved.cleanup;
+			diffGitClient = resolved.gitClient ?? gitClient;
 		}
 	} else if (useGitCompat) {
 		left = "";
@@ -63,7 +65,7 @@ export async function runGitPassThrough({
 	const fullGitArgs = [...partitioned.gitArgs, ...gitDiffArgs];
 
 	try {
-		const result = await gitClient.runGitDiffRaw(fullGitArgs);
+		const result = await diffGitClient.runGitDiffRaw(fullGitArgs);
 		if (result.exitCode !== 0) {
 			const message = result.stderr.trim().length > 0 ? result.stderr : "git diff failed";
 			throw new DiffxError(message, ExitCode.GIT_ERROR);

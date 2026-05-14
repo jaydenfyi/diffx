@@ -3,14 +3,18 @@
  */
 
 import git from "simple-git";
-import type { StatusResult } from "simple-git";
+import type { SimpleGit, StatusResult } from "simple-git";
 import type { GitDiffOptions, GitRemote } from "./types";
 
 /**
  * Git client wrapper for diffx operations
  */
 export class GitClient {
-	private readonly git = git();
+	private readonly git: SimpleGit;
+
+	constructor(baseDir?: string) {
+		this.git = baseDir ? git({ baseDir }) : git();
+	}
 
 	private buildColorFlag(color: "always" | "never" | "auto" | undefined): string[] {
 		return color ? [`--color=${color}`] : [];
@@ -298,6 +302,13 @@ export class GitClient {
 	async fetchFromUrl(url: string, refspecs: string[], depth: number): Promise<void> {
 		const args = ["fetch", "--no-tags", "--depth", String(depth), url, ...refspecs];
 		await this.git.raw(args);
+	}
+
+	/**
+	 * Initialize the client base directory as a bare repository.
+	 */
+	async initBare(): Promise<void> {
+		await this.git.raw(["init", "--bare"]);
 	}
 
 	/**

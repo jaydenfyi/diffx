@@ -10,15 +10,15 @@
 		"patch",
 		"pull-request"
 	],
+	"homepage": "https://github.com/jaydenfyi/diffx#readme",
+	"bugs": {
+		"url": "https://github.com/jaydenfyi/diffx/issues"
+	},
 	"license": "MIT",
 	"author": "Jayden",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/jaydenfyi/diffx.git"
-	},
-	"homepage": "https://github.com/jaydenfyi/diffx#readme",
-	"bugs": {
-		"url": "https://github.com/jaydenfyi/diffx/issues"
 	},
 	"bin": {
 		"diffx": "./dist/bin.mjs"
