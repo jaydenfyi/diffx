@@ -132,18 +132,21 @@ export async function resolvePRRefs(range: RefRange): Promise<{
 		throw new DiffxError("Invalid PR ref", ExitCode.INVALID_INPUT);
 	}
 
+	let tempRepo: Awaited<ReturnType<typeof createTemporaryGitClient>> | undefined;
+
 	try {
 		const [owner, repo] = range.ownerRepo.split("/");
 		if (!owner || !repo) {
 			throw new DiffxError(`Invalid owner/repo: ${range.ownerRepo}`, ExitCode.INVALID_INPUT);
 		}
 
-		const tempRepo = await createTemporaryGitClient();
+		tempRepo = await createTemporaryGitClient();
+		const resolvedTempRepo = tempRepo;
 		const tempPrefix = createTempRefPrefix();
 		const refs = await fetchPRRefsWithClient(
 			{ owner, repo, prNumber: range.prNumber },
 			tempPrefix,
-			tempRepo.gitClient,
+			resolvedTempRepo.gitClient,
 		);
 
 		// The merge ref is the PR head merged into the base branch
@@ -151,12 +154,20 @@ export async function resolvePRRefs(range: RefRange): Promise<{
 		return {
 			left: refs.leftRef,
 			right: refs.rightRef,
-			gitClient: tempRepo.gitClient,
+			gitClient: resolvedTempRepo.gitClient,
 			cleanup: async () => {
-				await tempRepo.cleanup();
+				await resolvedTempRepo.cleanup();
 			},
 		};
 	} catch (error) {
+		if (tempRepo) {
+			try {
+				await tempRepo.cleanup();
+			} catch {
+				// Preserve the original resolution error.
+			}
+		}
+
 		throw new DiffxError(
 			`Failed to fetch PR refs: ${(error as Error).message}`,
 			ExitCode.GIT_ERROR,

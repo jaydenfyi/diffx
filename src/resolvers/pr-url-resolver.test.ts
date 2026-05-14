@@ -242,6 +242,7 @@ describe("resolvePRRefs", () => {
 			} catch (error) {
 				expect((error as DiffxError).message).toContain("Failed to fetch PR refs");
 				expect((error as DiffxError).exitCode).toBe(ExitCode.GIT_ERROR);
+				expect(tempRepoMocks.cleanupTempRepo).toHaveBeenCalled();
 			}
 		});
 	});
