@@ -1,5 +1,11 @@
 # @jaydenfyi/diffx
 
+## 0.0.5
+
+### Patch Changes
+
+- [#3](https://github.com/jaydenfyi/diffx/pull/3) [`58ab252`](https://github.com/jaydenfyi/diffx/commit/58ab252dfc0f99ad089747b22e13cd39aba36fe7) Thanks [@jaydenfyi](https://github.com/jaydenfyi)! - Resolve GitHub PR URLs in an isolated temporary Git repository so URL diffs work outside an existing Git checkout and support sandbox temp roots via `DIFFX_TMPDIR`.
+
 ## 0.0.4
 
 ### Patch Changes
