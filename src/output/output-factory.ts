@@ -1,92 +1,8 @@
-/**
- * Output factory
- * Routes to the appropriate output generator based on mode
- */
-
 import type { OutputMode, PatchStyle } from "../types";
 import type { GitClient } from "../git/git-client";
 import { gitClient } from "../git/git-client";
-import { generatePatch } from "./patch-generator";
-import { GitDiffOptions } from "../git/types";
+import type { GitDiffOptions } from "../git/types";
 
-type OutputGeneratorFn = (
-	left: string,
-	right: string,
-	options: GitDiffOptions | undefined,
-	patchStyle?: PatchStyle,
-	client?: GitClient,
-) => Promise<string>;
-
-const outputGeneratorsByMode = {
-	diff: (left: string, right: string, options: GitDiffOptions | undefined, _patchStyle, client) =>
-		(client ?? gitClient).diff(left, right, options),
-	patch: generatePatch as OutputGeneratorFn,
-	stat: (left: string, right: string, options: GitDiffOptions | undefined, _patchStyle, client) =>
-		(client ?? gitClient).diffStat(left, right, options),
-	numstat: (
-		left: string,
-		right: string,
-		options: GitDiffOptions | undefined,
-		_patchStyle,
-		client,
-	) => (client ?? gitClient).diffNumStat(left, right, options),
-	shortstat: (
-		left: string,
-		right: string,
-		options: GitDiffOptions | undefined,
-		_patchStyle,
-		client,
-	) => (client ?? gitClient).diffShortStat(left, right, options),
-	"name-only": (
-		left: string,
-		right: string,
-		options: GitDiffOptions | undefined,
-		_patchStyle,
-		client,
-	) => (client ?? gitClient).diffNameOnly(left, right, options),
-	"name-status": (
-		left: string,
-		right: string,
-		options: GitDiffOptions | undefined,
-		_patchStyle,
-		client,
-	) => (client ?? gitClient).diffNameStatus(left, right, options),
-	summary: (
-		left: string,
-		right: string,
-		options: GitDiffOptions | undefined,
-		_patchStyle,
-		client,
-	) => (client ?? gitClient).diffSummary(left, right, options),
-} as const satisfies Record<OutputMode, OutputGeneratorFn>;
-
-type OutputGeneratorAgainstWorktreeFn = (
-	ref: string,
-	options: GitDiffOptions | undefined,
-) => Promise<string>;
-
-const outputGeneratorsAgainstWorktreeByMode = {
-	diff: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffAgainstWorktree(ref, options),
-	patch: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffAgainstWorktree(ref, options),
-	stat: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffStatAgainstWorktree(ref, options),
-	numstat: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNumStatAgainstWorktree(ref, options),
-	shortstat: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffShortStatAgainstWorktree(ref, options),
-	"name-only": (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNameOnlyAgainstWorktree(ref, options),
-	"name-status": (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffNameStatusAgainstWorktree(ref, options),
-	summary: (ref: string, options: GitDiffOptions | undefined) =>
-		gitClient.diffSummaryAgainstWorktree(ref, options),
-} as const satisfies Record<OutputMode, OutputGeneratorAgainstWorktreeFn>;
-
-/**
- * Generate output based on the specified mode
- */
 export async function generateOutput(
 	mode: OutputMode,
 	left: string,
@@ -95,18 +11,51 @@ export async function generateOutput(
 	patchStyle: PatchStyle | undefined,
 	client?: GitClient,
 ): Promise<string> {
-	const generator = outputGeneratorsByMode[mode];
-	return generator(left, right, options, patchStyle, client);
+	const c = client ?? gitClient;
+
+	if (mode === "patch" && patchStyle === "format-patch") {
+		return c.formatPatch(left, right, options);
+	}
+
+	switch (mode) {
+		case "diff":
+		case "patch":
+			return c.diff(left, right, options);
+		case "stat":
+			return c.diffStat(left, right, options);
+		case "numstat":
+			return c.diffNumStat(left, right, options);
+		case "shortstat":
+			return c.diffShortStat(left, right, options);
+		case "name-only":
+			return c.diffNameOnly(left, right, options);
+		case "name-status":
+			return c.diffNameStatus(left, right, options);
+		case "summary":
+			return c.diffSummary(left, right, options);
+	}
 }
 
-/**
- * Generate output between a ref and the working tree
- */
 export async function generateOutputAgainstWorktree(
 	mode: OutputMode,
 	ref: string,
 	options: GitDiffOptions | undefined,
 ): Promise<string> {
-	const generator = outputGeneratorsAgainstWorktreeByMode[mode];
-	return generator(ref, options);
+	switch (mode) {
+		case "diff":
+		case "patch":
+			return gitClient.diffAgainstWorktree(ref, options);
+		case "stat":
+			return gitClient.diffStatAgainstWorktree(ref, options);
+		case "numstat":
+			return gitClient.diffNumStatAgainstWorktree(ref, options);
+		case "shortstat":
+			return gitClient.diffShortStatAgainstWorktree(ref, options);
+		case "name-only":
+			return gitClient.diffNameOnlyAgainstWorktree(ref, options);
+		case "name-status":
+			return gitClient.diffNameStatusAgainstWorktree(ref, options);
+		case "summary":
+			return gitClient.diffSummaryAgainstWorktree(ref, options);
+	}
 }

@@ -152,7 +152,7 @@ function getBaseFlagName(flag: string): string {
  * - -f
  * - -fvalue (combined short form)
  */
-function parseFlagName(arg: string): string {
+export function parseFlagName(arg: string): string {
 	if (arg.startsWith("--")) {
 		// Long option: --flag or --flag=value
 		const idx = arg.indexOf("=");

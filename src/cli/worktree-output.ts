@@ -1,6 +1,6 @@
 import { buildFilePatterns, shouldIncludeFile } from "../filters/file-filter";
 import { gitClient } from "../git/git-client";
-import type { OutputMode } from "../types";
+import type { FilterOptions, OutputMode } from "../types";
 import {
 	buildStatusMapForRange,
 	buildStatusMapForWorktree,
@@ -8,7 +8,7 @@ import {
 	generateUntrackedOutput,
 	mergeOutputs,
 } from "../utils/overview-utils";
-import type { FileFilterOptions, ResolvedRefs } from "./command-types";
+import type { ResolvedRefs } from "./command";
 
 type StatRow = {
 	filePath: string;
@@ -172,7 +172,7 @@ async function appendUntrackedStatFiles(
 	output: string,
 	left: string,
 	right: string | undefined,
-	filterOptions: FileFilterOptions,
+	filterOptions: FilterOptions,
 	color: "always" | "never",
 ): Promise<string> {
 	if (right) {
@@ -255,7 +255,7 @@ async function appendUntrackedStatFiles(
 
 async function appendUntrackedShortStatFiles(
 	output: string,
-	filterOptions: FileFilterOptions,
+	filterOptions: FilterOptions,
 	color: "always" | "never",
 ): Promise<string> {
 	const untracked = await gitClient.getUntrackedFiles();
@@ -301,7 +301,7 @@ async function appendUntrackedFiles(
 	mode: OutputMode,
 	left: string,
 	right: string | undefined,
-	filterOptions: FileFilterOptions,
+	filterOptions: FilterOptions,
 	color: "always" | "never",
 ): Promise<string> {
 	if (right) {
@@ -342,7 +342,7 @@ export async function processWorktreeOutput(
 	output: string,
 	mode: OutputMode,
 	refs: ResolvedRefs,
-	filterOptions: FileFilterOptions,
+	filterOptions: FilterOptions,
 	color: "always" | "never",
 	useSummaryFormat: boolean,
 ): Promise<string> {

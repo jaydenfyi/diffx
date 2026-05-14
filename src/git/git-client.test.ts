@@ -357,22 +357,6 @@ describe("GitClient", () => {
 		});
 	});
 
-	describe("fetchPR", () => {
-		it("should fetch PR refs", async () => {
-			await gitClient.fetchPR("origin", 123);
-
-			expect(mockGit.raw).toHaveBeenCalledWith([
-				"fetch",
-				"--no-tags",
-				"--depth",
-				"2",
-				"origin",
-				"refs/pull/123/head:refs/remotes/origin/pull/123/head",
-				"refs/pull/123/merge:refs/remotes/origin/pull/123/merge",
-			]);
-		});
-	});
-
 	describe("deleteRefs", () => {
 		it("should delete refs that exist", async () => {
 			mockGit.raw.mockResolvedValue("");
@@ -634,24 +618,6 @@ describe("GitClient", () => {
 		});
 	});
 
-	describe("validateRefs", () => {
-		it("should return true when refs are valid", async () => {
-			mockGit.diff.mockResolvedValue("");
-
-			const result = await gitClient.validateRefs("main", "feature");
-
-			expect(result).toBe(true);
-		});
-
-		it("should return false when refs are invalid", async () => {
-			mockGit.diff.mockRejectedValue(new Error("invalid refs"));
-
-			const result = await gitClient.validateRefs("invalid1", "invalid2");
-
-			expect(result).toBe(false);
-		});
-	});
-
 	describe("getDefaultBranchRef", () => {
 		it("should use origin remote when available (preferred)", async () => {
 			mockGit.getRemotes.mockResolvedValue([
@@ -711,14 +677,6 @@ describe("GitClient", () => {
 			expect(result.stdout).toBe("");
 			expect(result.stderr).toBe("string error");
 			expect(result.exitCode).toBe(1);
-		});
-
-		it("should work in non-capture mode (still captures for now)", async () => {
-			mockGit.raw.mockResolvedValue("diff output");
-
-			const result = await gitClient.runGitDiffRaw(["HEAD"], { capture: false });
-
-			expect(result.stdout).toBe("diff output");
 		});
 	});
 });

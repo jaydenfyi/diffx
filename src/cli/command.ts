@@ -8,12 +8,13 @@ import { resolveRefs } from "../resolvers/ref-resolver";
 import { resolveAutoBaseRefs } from "../resolvers/auto-base-resolver";
 import { generateOutput, generateOutputAgainstWorktree } from "../output/output-factory";
 import { checkEmptyOutput, createNoFilesMatchedError } from "../errors/error-handler";
-import type { OutputMode } from "../types";
+import type { OutputMode, PatchStyle } from "../types";
+import { DiffxError, ExitCode } from "../types";
 import type { GitDiffOptions } from "../git/types";
+import type { GitClient } from "../git/git-client";
 import { gitClient } from "../git/git-client";
 import { pageOutput } from "./pager";
 import { partitionArgs } from "./arg-partitioner";
-import type { ResolvedRefs } from "./command-types";
 import {
 	buildDiffOptions,
 	getFilterOptions,
@@ -23,10 +24,17 @@ import {
 	hasLongOptionFlag,
 	shouldUseGitPassThrough,
 	validateNoConflictingFlags,
-	validatePagerOptions,
 } from "./command-options";
 import { runGitPassThrough } from "./git-pass-through";
 import { hasUnfilteredChanges, processWorktreeOutput } from "./worktree-output";
+
+export interface ResolvedRefs {
+	left: string;
+	right: string;
+	cleanup?: () => Promise<void>;
+	patchStyle?: PatchStyle;
+	gitClient?: GitClient;
+}
 
 const RANGE_TYPES_USING_DIFF_PATCH_STYLE = new Set([
 	"pr-ref",
@@ -182,6 +190,10 @@ export const diffxCommand = define({
 			index,
 		} = ctx.values;
 
+		if (pager && noPager) {
+			throw new DiffxError("Cannot use both --pager and --no-pager", ExitCode.INVALID_INPUT);
+		}
+
 		const toPatternList = (value: unknown): string | string[] | undefined => {
 			if (typeof value === "string") return value;
 			if (Array.isArray(value)) {
@@ -190,8 +202,6 @@ export const diffxCommand = define({
 			}
 			return undefined;
 		};
-
-		validatePagerOptions(pager, noPager);
 
 		const hasRange = Boolean(rangeOrUrl);
 		const partitionedInclude = partitioned.diffxFlags.get("--include");

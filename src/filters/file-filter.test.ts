@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { buildFilePatterns, fileMatchesPattern, shouldIncludeFile } from "./file-filter";
+import { buildFilePatterns, shouldIncludeFile } from "./file-filter";
 import type { FilterOptions } from "../types";
 
 describe("buildFilePatterns", () => {
@@ -63,49 +63,6 @@ describe("buildFilePatterns", () => {
 			const options: FilterOptions = {};
 			const result = buildFilePatterns(options);
 			expect(result).toEqual([]);
-		});
-	});
-});
-
-describe("fileMatchesPattern", () => {
-	describe("positive patterns", () => {
-		it("should match exact filename", () => {
-			expect(fileMatchesPattern("file.ts", "*.ts")).toBe(true);
-		});
-
-		it("should match glob patterns", () => {
-			expect(fileMatchesPattern("src/utils/helper.ts", "src/**/*.ts")).toBe(true);
-		});
-
-		it("should not match non-matching files", () => {
-			expect(fileMatchesPattern("file.js", "*.ts")).toBe(false);
-		});
-	});
-
-	describe("negative patterns", () => {
-		it("should handle negative pathspec prefix", () => {
-			// Negative pattern means "exclude if matches"
-			// But fileMatchesPattern checks if the pattern matches the file
-			// A negative pattern starting with :! means the file should NOT match the inner pattern
-			expect(fileMatchesPattern("file.ts", ":!*.ts")).toBe(false); // Excluded
-			expect(fileMatchesPattern("file.js", ":!*.ts")).toBe(true); // Not excluded
-		});
-
-		it("should handle negative glob patterns", () => {
-			expect(fileMatchesPattern("node_modules/foo.js", ":!node_modules/**")).toBe(false);
-			expect(fileMatchesPattern("src/foo.js", ":!node_modules/**")).toBe(true);
-		});
-	});
-
-	describe("dotfiles", () => {
-		it("should match dotfiles with dot option", () => {
-			expect(fileMatchesPattern(".env", ".*")).toBe(true);
-			expect(fileMatchesPattern(".git/config", ".git/*")).toBe(true);
-		});
-
-		it("should match dotfiles with double-star patterns", () => {
-			expect(fileMatchesPattern(".env", "**/.env")).toBe(true);
-			expect(fileMatchesPattern("src/.env", "**/.env")).toBe(true);
 		});
 	});
 });
